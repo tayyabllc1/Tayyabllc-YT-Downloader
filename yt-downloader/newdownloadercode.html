@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Bulk Video Downloader 2025 by TAYYAB LLC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #00ff99;
+            text-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            color: #ffffff;
+            text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        #videoUrls {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 2px solid #00ff99;
+            border-radius: 5px;
+            resize: none;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #videoUrls:focus {
+            border-color: #ff00cc;
+        }
+
+        #downloadBtn {
+            padding: 10px 20px;
+            background: #00ff99;
+            color: black;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        #downloadBtn:hover {
+            background: #ff00cc;
+            transform: scale(1.1);
+        }
+
+        #progressContainer {
+            margin-top: 20px;
+        }
+
+        .progress-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #00ff99;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+
+        .status-message {
+            position: relative;
+            z-index: 1;
+        }
+
+        .success {
+            color: #00ff99;
+        }
+
+        .error {
+            color: #ff00cc;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #ffffff;
+            text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="logo.png" alt="TAYYAB LLC Logo" class="logo">
+            <h1>YouTube Bulk Video Downloader 2025</h1>
+            <p class="tagline">Powered by TAYYAB LLC</p>
+        </header>
+        <div class="input-container">
+            <textarea id="videoUrls" placeholder="Enter YouTube video URLs or playlists (one per line)"></textarea>
+            <button id="downloadBtn">Download Videos</button>
+        </div>
+        <div id="progressContainer"></div>
+        <footer>
+            <p>&copy; 2025 TAYYAB LLC. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoUrlsInput = document.getElementById('videoUrls');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const progressContainer = document.getElementById('progressContainer');
+
+            downloadBtn.addEventListener('click', () => {
+                const urls = videoUrlsInput.value.split('\n').filter(url => url.trim() !== '');
+                if (urls.length === 0) {
+                    alert('Please enter at least one valid YouTube video URL.');
+                    return;
+                }
+
+                progressContainer.innerHTML = ''; // Clear previous progress
+                downloadVideos(urls);
+            });
+
+            function downloadVideos(urls) {
+                urls.forEach((url, index) => {
+                    const progressItem = document.createElement('div');
+                    progressItem.classList.add('progress-item');
+                    progressItem.innerHTML = `
+                        <div class="progress-bar"></div>
+                        <div class="status-message">Downloading video ${index + 1}...</div>
+                    `;
+                    progressContainer.appendChild(progressItem);
+
+                    fetch(`/download?url=${encodeURIComponent(url)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const progressBar = progressItem.querySelector('.progress-bar');
+                            const statusMessage = progressItem.querySelector('.status-message');
+
+                            if (data.success) {
+                                progressBar.style.width = '100%';
+                                statusMessage.textContent = \`Video ${index + 1}: Downloaded successfully.\`;
+                                statusMessage.classList.add('success');
+                            } else {
+                                progressBar.style.width = '100%';
+                                statusMessage.textContent = \`Video ${index + 1}: Failed to download (\${data.message}).\`;
+                                statusMessage.classList.add('error');
+                            }
+                        })
+                        .catch(error => {
+                            const progressBar = progressItem.querySelector('.progress-bar');
+                            const statusMessage = progressItem.querySelector('.status-message');
+                            progressBar.style.width = '100%';
+                            statusMessage.textContent = \`Video ${index + 1}: Error during download (\${error.message}).\`;
+                            statusMessage.classList.add('error');
+                        });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
